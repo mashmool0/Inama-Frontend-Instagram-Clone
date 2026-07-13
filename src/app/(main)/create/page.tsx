@@ -1,0 +1,5 @@
+import { CreatePostPage } from '@/features/posts/components/CreatePostPage'
+
+export default function Page() {
+  return <CreatePostPage />
+}
