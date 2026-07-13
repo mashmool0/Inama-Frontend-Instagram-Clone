@@ -33,6 +33,28 @@ Create a `.env.local` file:
 NEXT_PUBLIC_API_URL=http://localhost:8080
 ```
 
+## Docker
+
+Build and run with Docker Compose:
+
+```bash
+docker compose up --build
+```
+
+The frontend will be available at [http://localhost:3000](http://localhost:3000).
+
+If your API Gateway is not on the default address, set it before building:
+
+```bash
+NEXT_PUBLIC_API_URL=http://localhost:8080 docker compose up --build
+```
+
+Notes:
+
+- `NEXT_PUBLIC_API_URL` is a client-side variable, so it is baked into the frontend bundle at image build time.
+- If you change `NEXT_PUBLIC_API_URL`, rebuild the image with `docker compose up --build`.
+- Container health is exposed at `/api/health`.
+
 ## Docs
 
 See the [`docs/`](./docs/) folder:
