@@ -3,12 +3,15 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'motion/react'
-import { ImageIcon, Mail, Lock, User, Eye, EyeOff, Sparkles, Check } from 'lucide-react'
+import { ImageIcon, Mail, Lock, Eye, EyeOff, Sparkles, Check } from 'lucide-react'
 
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { apiErrorMessage } from '@/lib/api-error'
+import { createParticles } from '@/lib/particles'
 import { useRegisterMutation } from '../hooks'
+
+const particles = createParticles(20, 303, 2, 1, 3)
 
 export function RegisterPage() {
   const router = useRouter()
@@ -35,13 +38,13 @@ export function RegisterPage() {
       <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-gradient-to-bl from-accent/20 to-transparent rounded-full blur-3xl animate-pulse"></div>
       <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-gradient-to-tr from-primary/20 to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
 
-      {[...Array(20)].map((_, i) => (
+      {particles.map((particle, i) => (
         <motion.div
           key={i}
           className="absolute w-1 h-1 bg-accent/40 rounded-full"
-          style={{ top: `${Math.random() * 100}%`, left: `${Math.random() * 100}%` }}
+          style={{ top: `${particle.top}%`, left: `${particle.left}%` }}
           animate={{ y: [0, -20, 0], opacity: [0, 1, 0] }}
-          transition={{ duration: 2 + Math.random(), repeat: Infinity, delay: Math.random() * 3 }}
+          transition={{ duration: particle.duration, repeat: Infinity, delay: particle.delay }}
         />
       ))}
 

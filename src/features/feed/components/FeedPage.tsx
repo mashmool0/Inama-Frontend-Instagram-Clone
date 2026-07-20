@@ -15,7 +15,7 @@ import { useAddCommentMutation, useLikePostMutation } from '@/features/posts/hoo
 
 export function FeedPage() {
   const feedQuery = useFeedInfiniteQuery()
-  const posts = feedQuery.data?.pages.flatMap((page) => page.posts) ?? []
+  const posts = useMemo(() => feedQuery.data?.pages.flatMap((page) => page.posts) ?? [], [feedQuery.data])
   const authorIds = useMemo(() => posts.map((post) => post.author_id), [posts])
   const { data: profilesMap, isLoading: profilesLoading } = useProfilesMap(authorIds)
 

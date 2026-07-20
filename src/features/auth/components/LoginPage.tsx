@@ -8,7 +8,10 @@ import { ImageIcon, User, Lock, Eye, EyeOff, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { apiErrorMessage } from '@/lib/api-error'
+import { createParticles } from '@/lib/particles'
 import { useLoginMutation } from '../hooks'
+
+const particles = createParticles(15, 202, 2, 1, 3)
 
 export function LoginPage() {
   const router = useRouter()
@@ -26,13 +29,13 @@ export function LoginPage() {
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-primary/20 to-transparent rounded-full blur-3xl animate-pulse"></div>
       <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-accent/20 to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
 
-      {[...Array(15)].map((_, i) => (
+      {particles.map((particle, i) => (
         <motion.div
           key={i}
           className="absolute w-1 h-1 bg-primary/40 rounded-full"
-          style={{ top: `${Math.random() * 100}%`, left: `${Math.random() * 100}%` }}
+          style={{ top: `${particle.top}%`, left: `${particle.left}%` }}
           animate={{ y: [0, -20, 0], opacity: [0, 1, 0] }}
-          transition={{ duration: 2 + Math.random(), repeat: Infinity, delay: Math.random() * 3 }}
+          transition={{ duration: particle.duration, repeat: Infinity, delay: particle.delay }}
         />
       ))}
 

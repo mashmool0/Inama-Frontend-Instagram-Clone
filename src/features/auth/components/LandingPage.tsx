@@ -6,6 +6,9 @@ import { motion } from 'motion/react'
 import { ImageIcon, Video, Heart, Users, TrendingUp, Sparkles, Zap } from 'lucide-react'
 
 import { Button } from '@/components/ui/Button'
+import { createParticles } from '@/lib/particles'
+
+const particles = createParticles(20, 101, 3, 2, 5)
 
 export function LandingPage() {
   const router = useRouter()
@@ -25,13 +28,13 @@ export function LandingPage() {
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-accent/20 to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-gradient-to-br from-primary/10 to-accent/10 rounded-full blur-3xl"></div>
 
-      {[...Array(20)].map((_, i) => (
+      {particles.map((particle, i) => (
         <motion.div
           key={i}
           className="absolute w-2 h-2 bg-primary/30 rounded-full"
-          style={{ top: `${Math.random() * 100}%`, left: `${Math.random() * 100}%` }}
+          style={{ top: `${particle.top}%`, left: `${particle.left}%` }}
           animate={{ y: [0, -30, 0], opacity: [0, 1, 0], scale: [0, 1, 0] }}
-          transition={{ duration: 3 + Math.random() * 2, repeat: Infinity, delay: Math.random() * 5 }}
+          transition={{ duration: particle.duration, repeat: Infinity, delay: particle.delay }}
         />
       ))}
 

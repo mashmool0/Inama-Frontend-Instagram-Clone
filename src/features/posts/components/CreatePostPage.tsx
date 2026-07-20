@@ -14,7 +14,7 @@ export function CreatePostPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState('')
   const [caption, setCaption] = useState('')
-  const [uploadComplete, setUploadComplete] = useState(false)
+  const uploadComplete = false
   const [error, setError] = useState('')
 
   const selectFile = (file?: File) => {
