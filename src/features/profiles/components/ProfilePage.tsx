@@ -1,14 +1,13 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import Link from 'next/link'
+import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { Settings, Grid, Bookmark, Tag } from 'lucide-react'
 
 import { Avatar } from '@/components/ui/Avatar'
 import { Button } from '@/components/ui/Button'
 import { useAuthStore } from '@/features/auth/store'
-import { useExploreInfiniteQuery } from '@/features/feed/hooks'
+import { apiErrorMessage } from '@/lib/api-error'
 import { formatCompactFa } from '@/lib/format'
 import { useFollowMutation, useProfileByUsernameQuery, useUnfollowMutation } from '../hooks'
 
@@ -18,14 +17,10 @@ export function ProfilePage() {
   const currentProfile = useAuthStore((state) => state.profile)
   const requestedUsername = params.username === 'me' ? currentProfile?.username : params.username
   const profileQuery = useProfileByUsernameQuery(requestedUsername)
-  const profile = profileQuery.data || currentProfile
+  const profile = profileQuery.data || (requestedUsername === currentProfile?.username ? currentProfile : undefined)
   const isOwnProfile = profile?.id === currentProfile?.id
   const [activeTab, setActiveTab] = useState<'posts' | 'saved' | 'tagged'>('posts')
-  const exploreQuery = useExploreInfiniteQuery()
-  const authoredPosts = useMemo(() => {
-    const allExplorePosts = exploreQuery.data?.pages.flatMap((page) => page.posts) ?? []
-    return allExplorePosts.filter((post) => post.author_id === profile?.id).slice(0, 12)
-  }, [exploreQuery.data, profile?.id])
+  const [isFollowing, setIsFollowing] = useState(false)
   const followMutation = useFollowMutation(profile?.id || '')
   const unfollowMutation = useUnfollowMutation(profile?.id || '')
 
@@ -58,22 +53,27 @@ export function ProfilePage() {
                 </Button>
               </>
             ) : (
-              <Button onClick={() => (profile ? followMutation.mutate() : undefined)}>دنبال کنید</Button>
-            )}
-            {!isOwnProfile && (
-              <Button variant="outline" onClick={() => (profile ? unfollowMutation.mutate() : undefined)}>
-                لغو دنبال‌کردن
-              </Button>
+              !isFollowing ? (
+                <Button onClick={() => (profile ? followMutation.mutate(undefined, { onSuccess: () => setIsFollowing(true) }) : undefined)}>دنبال کنید</Button>
+              ) : (
+                <Button variant="outline" onClick={() => (profile ? unfollowMutation.mutate(undefined, { onSuccess: () => setIsFollowing(false) }) : undefined)}>
+                  لغو دنبال‌کردن
+                </Button>
+              )
             )}
           </div>
         </div>
 
         <div className="px-6 mt-6">
+          {profileQuery.isError && <p role="alert" className="mb-4 text-sm text-red-500">{apiErrorMessage(profileQuery.error, 'بارگذاری پروفایل انجام نشد.')}</p>}
+          {(followMutation.isError || unfollowMutation.isError) && (
+            <p role="alert" className="mb-4 text-sm text-red-500">{apiErrorMessage(followMutation.error || unfollowMutation.error, 'تغییر وضعیت دنبال‌کردن انجام نشد.')}</p>
+          )}
           <p className="text-foreground mb-4 leading-relaxed">{profile?.bio || 'بیوگرافی ثبت نشده است.'}</p>
 
           <div className="flex items-center gap-8">
             <div className="text-center">
-              <span className="block text-xl font-bold">{formatCompactFa(authoredPosts.length)}</span>
+              <span className="block text-xl font-bold">{formatCompactFa(0)}</span>
               <span className="text-sm text-muted-foreground">پست</span>
             </div>
             <button className="text-center hover:opacity-80 transition-opacity">
@@ -110,13 +110,7 @@ export function ProfilePage() {
 
       <div className="mt-6">
         {activeTab === 'posts' && (
-          <div className="grid grid-cols-3 gap-1">
-            {authoredPosts.map((post) => (
-              <Link key={post.id} href={`/posts/${post.id}`} className="aspect-square bg-muted rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity">
-                <img src={post.media_url} alt="" className="w-full h-full object-cover" />
-              </Link>
-            ))}
-          </div>
+          <div className="text-center py-12 text-muted-foreground">سرویس پست‌ها در حال حاضر در دسترس نیست.</div>
         )}
         {activeTab === 'saved' && (
           <div className="text-center py-12">

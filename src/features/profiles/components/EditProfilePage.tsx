@@ -9,12 +9,15 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
 import { useAuthStore } from '@/features/auth/store'
+import { useUpdateUsernameMutation } from '@/features/auth/hooks'
+import { apiErrorMessage } from '@/lib/api-error'
 import { useUpdateProfileMutation } from '../hooks'
 
 export function EditProfilePage() {
   const router = useRouter()
   const profile = useAuthStore((state) => state.profile)
-  const mutation = useUpdateProfileMutation()
+  const profileMutation = useUpdateProfileMutation()
+  const usernameMutation = useUpdateUsernameMutation()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [avatarPreview, setAvatarPreview] = useState(profile?.avatar_url || '')
   const [avatarDataUrl, setAvatarDataUrl] = useState(profile?.avatar_url || '')
@@ -36,11 +39,13 @@ export function EditProfilePage() {
         <form
           onSubmit={async (event) => {
             event.preventDefault()
-            await mutation.mutateAsync({
-              username: formData.username,
+            await profileMutation.mutateAsync({
               bio: formData.bio,
               avatar_url: avatarDataUrl,
             })
+            if (formData.username !== profile?.username) {
+              await usernameMutation.mutateAsync(formData.username)
+            }
             router.push(`/profile/${formData.username}`)
           }}
           className="space-y-6"
@@ -121,12 +126,18 @@ export function EditProfilePage() {
           <Input label="ایمیل" type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} placeholder="example@email.com" />
           <Input label="شماره تماس" type="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder="۰۹۱۲۳۴۵۶۷۸۹" />
 
+          {(profileMutation.isError || usernameMutation.isError) && (
+            <p role="alert" className="text-sm text-red-500">
+              {apiErrorMessage(profileMutation.error || usernameMutation.error, 'ذخیره تغییرات انجام نشد.')}
+            </p>
+          )}
+
           <div className="flex items-center justify-end gap-3 pt-4">
             <Button type="button" variant="outline" onClick={() => router.back()}>
               انصراف
             </Button>
-            <Button type="submit" disabled={!canSave || mutation.isPending}>
-              {mutation.isPending ? 'در حال ذخیره...' : 'ذخیره تغییرات'}
+            <Button type="submit" disabled={!canSave || profileMutation.isPending || usernameMutation.isPending}>
+              {profileMutation.isPending || usernameMutation.isPending ? 'در حال ذخیره...' : 'ذخیره تغییرات'}
             </Button>
           </div>
         </form>

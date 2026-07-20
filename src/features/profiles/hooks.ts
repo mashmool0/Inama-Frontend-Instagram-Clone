@@ -18,6 +18,8 @@ export function useProfileByUsernameQuery(username?: string) {
     queryKey: ['profiles', 'username', username],
     queryFn: () => getProfileByUsername(username!),
     enabled: Boolean(username),
+    retry: 30,
+    retryDelay: 250,
   })
 }
 
