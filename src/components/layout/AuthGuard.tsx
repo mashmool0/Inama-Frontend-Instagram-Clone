@@ -9,14 +9,15 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
   const token = useAuthStore((state) => state.accessToken)
+  const hasHydrated = useAuthStore((state) => state.hasHydrated)
 
   useEffect(() => {
-    if (!token) {
+    if (hasHydrated && !token) {
       router.replace(`/login?next=${encodeURIComponent(pathname)}`)
     }
-  }, [pathname, router, token])
+  }, [hasHydrated, pathname, router, token])
 
-  if (!token) {
+  if (!hasHydrated || !token) {
     return null
   }
 

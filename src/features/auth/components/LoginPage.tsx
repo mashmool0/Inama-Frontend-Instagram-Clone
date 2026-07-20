@@ -3,10 +3,11 @@
 import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'motion/react'
-import { ImageIcon, Phone, Lock, Eye, EyeOff, Sparkles } from 'lucide-react'
+import { ImageIcon, User, Lock, Eye, EyeOff, Sparkles } from 'lucide-react'
 
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
+import { apiErrorMessage } from '@/lib/api-error'
 import { useLoginMutation } from '../hooks'
 
 export function LoginPage() {
@@ -15,7 +16,7 @@ export function LoginPage() {
   const loginMutation = useLoginMutation()
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
-    phone: '',
+    identifier: '',
     password: '',
   })
 
@@ -62,22 +63,28 @@ export function LoginPage() {
             <form
               onSubmit={async (event) => {
                 event.preventDefault()
-                await loginMutation.mutateAsync(formData)
-                router.push(searchParams.get('next') || '/feed')
+                const result = await loginMutation.mutateAsync(formData)
+                router.push(searchParams.get('next') || `/profile/${encodeURIComponent(result.profile.username)}`)
               }}
               className="space-y-5"
             >
               <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.6 }} className="relative group/input">
                 <Input
-                  type="tel"
-                  placeholder="شماره موبایل"
-                  value={formData.phone}
-                  onChange={(event) => setFormData({ ...formData, phone: event.target.value })}
+                  type="text"
+                  placeholder="نام کاربری یا ایمیل"
+                  value={formData.identifier}
+                  onChange={(event) => setFormData({ ...formData, identifier: event.target.value })}
                   className="pr-12 bg-input-background/50 backdrop-blur-sm border-border/50 focus:border-primary/50"
                   required
                 />
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-hover/input:text-primary transition-colors" />
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-hover/input:text-primary transition-colors" />
               </motion.div>
+
+              {loginMutation.isError && (
+                <p role="alert" className="text-sm text-red-500">
+                  {apiErrorMessage(loginMutation.error, 'ورود انجام نشد. نام کاربری، ایمیل یا رمز عبور را بررسی کنید.')}
+                </p>
+              )}
 
               <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.7 }} className="relative group/input">
                 <Input
@@ -105,7 +112,7 @@ export function LoginPage() {
               </motion.div>
 
               <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.9 }} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button type="submit" className="w-full relative overflow-hidden group/btn shadow-lg shadow-primary/30" size="lg">
+                <Button type="submit" disabled={loginMutation.isPending} className="w-full relative overflow-hidden group/btn shadow-lg shadow-primary/30" size="lg">
                   <span className="relative z-10">{loginMutation.isPending ? 'در حال ورود...' : 'ورود به حساب'}</span>
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-200%] group-hover/btn:translate-x-[200%] transition-transform duration-1000"></div>
                 </Button>

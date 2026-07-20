@@ -3,22 +3,23 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'motion/react'
-import { ImageIcon, Phone, Lock, User, Eye, EyeOff, Sparkles, Check } from 'lucide-react'
+import { ImageIcon, Mail, Lock, User, Eye, EyeOff, Sparkles, Check } from 'lucide-react'
 
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { setPendingRegistration } from '@/lib/session'
+import { apiErrorMessage } from '@/lib/api-error'
 import { useRegisterMutation } from '../hooks'
 
 export function RegisterPage() {
   const router = useRouter()
   const registerMutation = useRegisterMutation()
   const [showPassword, setShowPassword] = useState(false)
+  const [validationError, setValidationError] = useState('')
   const [formData, setFormData] = useState({
-    displayName: '',
+    email: '',
     username: '',
-    phone: '',
     password: '',
+    confirmPassword: '',
   })
 
   const benefits = [
@@ -96,22 +97,23 @@ export function RegisterPage() {
                 <form
                   onSubmit={async (event) => {
                     event.preventDefault()
-                    await registerMutation.mutateAsync({
-                      phone: formData.phone,
+                    setValidationError('')
+                    if (formData.password !== formData.confirmPassword) {
+                      setValidationError('رمز عبور و تکرار آن یکسان نیستند.')
+                      return
+                    }
+                    const result = await registerMutation.mutateAsync({
+                      email: formData.email,
+                      username: formData.username,
                       password: formData.password,
                     })
-                    setPendingRegistration({
-                      phone: formData.phone,
-                      username: formData.username,
-                      displayName: formData.displayName,
-                    })
-                    router.push(`/verify-otp?phone=${encodeURIComponent(formData.phone)}`)
+                    router.push(`/profile/${encodeURIComponent(result.profile.username)}`)
                   }}
                   className="space-y-4"
                 >
                   <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.4 }} className="relative group/input">
-                    <Input value={formData.displayName} onChange={(event) => setFormData({ ...formData, displayName: event.target.value })} type="text" placeholder="نام نمایشی" className="pr-12 bg-input-background/50 backdrop-blur-sm border-border/50 focus:border-primary/50" required />
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-hover/input:text-primary transition-colors" />
+                    <Input value={formData.email} onChange={(event) => setFormData({ ...formData, email: event.target.value })} type="email" placeholder="ایمیل" className="pr-12 bg-input-background/50 backdrop-blur-sm border-border/50 focus:border-primary/50" required />
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-hover/input:text-primary transition-colors" />
                   </motion.div>
 
                   <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.5 }} className="relative group/input">
@@ -120,24 +122,30 @@ export function RegisterPage() {
                   </motion.div>
 
                   <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.6 }} className="relative group/input">
-                    <Input value={formData.phone} onChange={(event) => setFormData({ ...formData, phone: event.target.value })} type="tel" placeholder="شماره موبایل" className="pr-12 bg-input-background/50 backdrop-blur-sm border-border/50 focus:border-primary/50" required />
-                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-hover/input:text-primary transition-colors" />
+                    <Input value={formData.password} onChange={(event) => setFormData({ ...formData, password: event.target.value })} type={showPassword ? 'text' : 'password'} placeholder="رمز عبور" className="pr-12 bg-input-background/50 backdrop-blur-sm border-border/50 focus:border-primary/50" required />
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-hover/input:text-primary transition-colors" />
                   </motion.div>
 
                   <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.7 }} className="relative group/input">
-                    <Input value={formData.password} onChange={(event) => setFormData({ ...formData, password: event.target.value })} type={showPassword ? 'text' : 'password'} placeholder="رمز عبور" className="pr-12 bg-input-background/50 backdrop-blur-sm border-border/50 focus:border-primary/50" required />
+                    <Input value={formData.confirmPassword} onChange={(event) => setFormData({ ...formData, confirmPassword: event.target.value })} type={showPassword ? 'text' : 'password'} placeholder="تکرار رمز عبور" className="pr-12 bg-input-background/50 backdrop-blur-sm border-border/50 focus:border-primary/50" required />
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-hover/input:text-primary transition-colors" />
                     <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </motion.button>
                   </motion.div>
 
+                  {(validationError || registerMutation.isError) && (
+                    <p role="alert" className="text-sm text-red-500">
+                      {validationError || apiErrorMessage(registerMutation.error, 'ثبت نام انجام نشد. اطلاعات را بررسی کنید.')}
+                    </p>
+                  )}
+
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }} className="text-xs text-muted-foreground leading-relaxed bg-muted/30 p-3 rounded-xl">
                     با ثبت نام، <span className="text-primary cursor-pointer hover:underline">شرایط استفاده</span> و <span className="text-primary cursor-pointer hover:underline">حریم خصوصی</span> را می‌پذیرید.
                   </motion.div>
 
                   <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.9 }} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Button type="submit" className="w-full relative overflow-hidden group/btn shadow-lg shadow-accent/30" size="lg">
+                    <Button type="submit" disabled={registerMutation.isPending} className="w-full relative overflow-hidden group/btn shadow-lg shadow-accent/30" size="lg">
                       <span className="relative z-10">{registerMutation.isPending ? 'در حال ثبت نام...' : 'ثبت نام'}</span>
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-200%] group-hover/btn:translate-x-[200%] transition-transform duration-1000"></div>
                     </Button>

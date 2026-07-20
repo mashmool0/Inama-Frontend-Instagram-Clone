@@ -1,11 +1,5 @@
-import { Suspense } from 'react'
-
-import { VerifyOtpPage } from '@/features/auth/components/VerifyOtpPage'
+import { redirect } from 'next/navigation'
 
 export default function Page() {
-  return (
-    <Suspense>
-      <VerifyOtpPage />
-    </Suspense>
-  )
+  redirect('/register')
 }

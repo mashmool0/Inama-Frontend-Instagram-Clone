@@ -1,11 +1,5 @@
-import { Suspense } from 'react'
-
-import { ResetPasswordPage } from '@/features/auth/components/ResetPasswordPage'
+import { redirect } from 'next/navigation'
 
 export default function Page() {
-  return (
-    <Suspense>
-      <ResetPasswordPage />
-    </Suspense>
-  )
+  redirect('/login')
 }

@@ -9,7 +9,9 @@ import { getProfileById } from '@/features/profiles/api'
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    useAuthStore.persist.rehydrate()
+    void Promise.resolve(useAuthStore.persist.rehydrate()).finally(() => {
+      useAuthStore.getState().setHasHydrated(true)
+    })
   }, [])
 
   return (
@@ -27,6 +29,8 @@ function AuthBootstrapper() {
     queryKey: ['auth', 'current-profile', userId],
     queryFn: () => getProfileById(userId!),
     enabled: Boolean(userId),
+    retry: 8,
+    retryDelay: 250,
   })
 
   useEffect(() => {

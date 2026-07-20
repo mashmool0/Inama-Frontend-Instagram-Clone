@@ -12,8 +12,11 @@ interface AuthState {
   refreshToken: string | null
   userId: string | null
   profile: UserProfile | null
+  hasHydrated: boolean
   setSession: (tokens: TokenPair) => void
   setProfile: (profile: UserProfile | null) => void
+  setUsername: (username: string) => void
+  setHasHydrated: (hasHydrated: boolean) => void
   clearSession: () => void
 }
 
@@ -24,6 +27,7 @@ export const useAuthStore = create<AuthState>()(
       refreshToken: null,
       userId: null,
       profile: null,
+      hasHydrated: false,
       setSession: (tokens) =>
         set({
           accessToken: tokens.access_token,
@@ -36,12 +40,17 @@ export const useAuthStore = create<AuthState>()(
           profile,
           userId: profile?.id ?? state.userId,
         })),
+      setUsername: (username) =>
+        set((state) => ({
+          profile: state.profile ? { ...state.profile, username } : null,
+        })),
+      setHasHydrated: (hasHydrated) => set({ hasHydrated }),
       clearSession: () =>
         set({
           accessToken: null,
           refreshToken: null,
           userId: null,
-          profile: null,
+        profile: null,
         }),
     }),
     {
@@ -52,6 +61,7 @@ export const useAuthStore = create<AuthState>()(
         userId: state.userId,
         profile: state.profile,
       }),
+      skipHydration: true,
     },
   ),
 )

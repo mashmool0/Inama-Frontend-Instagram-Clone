@@ -1,5 +1,5 @@
-import { SetUsernamePage } from '@/features/auth/components/SetUsernamePage'
+import { redirect } from 'next/navigation'
 
 export default function Page() {
-  return <SetUsernamePage />
+  redirect('/register')
 }

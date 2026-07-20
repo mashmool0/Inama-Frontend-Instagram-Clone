@@ -5,16 +5,12 @@ export interface TokenPair {
 }
 
 export interface RegisterRequest {
-  phone: string
+  email: string
+  username: string
   password: string
 }
 
-export interface VerifyOtpRequest {
-  phone: string
-  code: string
-}
-
 export interface LoginRequest {
-  phone: string
+  identifier: string
   password: string
 }
