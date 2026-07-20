@@ -4,6 +4,7 @@ import { Heart, MessageCircle, UserPlus } from 'lucide-react'
 
 import { Avatar } from '@/components/ui/Avatar'
 import { formatRelativeTimeFa } from '@/lib/format'
+import { apiErrorMessage } from '@/lib/api-error'
 import { useProfilesMap } from '@/features/profiles/hooks'
 import { useMarkAllNotificationsReadMutation, useMarkNotificationReadMutation, useNotificationsInfiniteQuery } from '../hooks'
 
@@ -74,6 +75,16 @@ export function NotificationsPage() {
             خواندن همه
           </button>
         </div>
+
+        {(notificationsQuery.isError || markOneMutation.isError || markAllMutation.isError) && (
+          <p role="alert" className="mb-4 text-sm text-red-500">
+            {apiErrorMessage(notificationsQuery.error || markOneMutation.error || markAllMutation.error, 'عملیات اعلان‌ها انجام نشد.')}
+          </p>
+        )}
+
+        {!notificationsQuery.isLoading && notifications.length === 0 && (
+          <div className="rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">هنوز اعلانی ندارید.</div>
+        )}
 
         <div className="space-y-6">
           <div>
