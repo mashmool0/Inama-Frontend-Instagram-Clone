@@ -95,6 +95,10 @@ export function FeedPage() {
           </div>
         </motion.div>
 
+        <div className="mb-6 rounded-2xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
+          سرویس فید در حال حاضر در دسترس نیست.
+        </div>
+
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="space-y-6 md:space-y-8">
           {posts.map((post, index) => (
             <motion.div key={post.id} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 * index }}>

@@ -10,6 +10,6 @@ export function useSearchInfiniteQuery(query: string, type: SearchType = 'ALL') 
     queryFn: ({ pageParam }: { pageParam?: string }) => search({ query, type, cursor: pageParam, limit: 20 }),
     initialPageParam: '',
     getNextPageParam: (lastPage) => lastPage.next_cursor || undefined,
-    enabled: query.trim().length > 0,
+    enabled: false,
   })
 }

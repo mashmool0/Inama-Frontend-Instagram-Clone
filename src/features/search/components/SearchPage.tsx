@@ -72,6 +72,9 @@ export function SearchPage() {
 
         {searchQuery && (
           <div className="mt-6">
+            <div className="mb-6 rounded-2xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
+              سرویس جستجو در حال حاضر در دسترس نیست.
+            </div>
             <div className="flex items-center gap-4 mb-6 border-b border-border">
               {[
                 ['users', 'کاربران'],

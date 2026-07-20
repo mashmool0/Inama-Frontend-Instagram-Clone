@@ -8,7 +8,7 @@ export function usePostQuery(postId: string) {
   return useQuery({
     queryKey: ['posts', postId],
     queryFn: () => getPost(postId),
-    enabled: Boolean(postId),
+    enabled: false,
   })
 }
 
@@ -18,7 +18,7 @@ export function useCommentsInfiniteQuery(postId: string) {
     queryFn: ({ pageParam }: { pageParam?: string }) => getComments(postId, { cursor: pageParam, limit: 20 }),
     initialPageParam: '',
     getNextPageParam: (lastPage) => lastPage.next_cursor || undefined,
-    enabled: Boolean(postId),
+    enabled: false,
   })
 }
 

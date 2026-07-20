@@ -16,6 +16,10 @@ export function ExplorePage() {
         <p className="text-muted-foreground">جدیدترین محتواهای عمومی را کشف کنید</p>
       </div>
 
+      <div className="mb-6 rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
+        سرویس اکسپلور در حال حاضر در دسترس نیست.
+      </div>
+
       {exploreQuery.isLoading ? (
         <div className="flex justify-center py-12">
           <Spinner />

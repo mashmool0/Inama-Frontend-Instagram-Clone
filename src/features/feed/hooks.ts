@@ -12,6 +12,7 @@ export function useFeedInfiniteQuery() {
     queryFn: ({ pageParam }: { pageParam?: string }) => getFeed({ cursor: pageParam, limit }),
     initialPageParam: '',
     getNextPageParam: (lastPage) => lastPage.next_cursor || undefined,
+    enabled: false,
   })
 }
 
@@ -21,5 +22,6 @@ export function useExploreInfiniteQuery() {
     queryFn: ({ pageParam }: { pageParam?: string }) => getExplore({ cursor: pageParam, limit }),
     initialPageParam: '',
     getNextPageParam: (lastPage) => lastPage.next_cursor || undefined,
+    enabled: false,
   })
 }

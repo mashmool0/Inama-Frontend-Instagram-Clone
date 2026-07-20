@@ -7,11 +7,9 @@ import { Upload, X, Image as ImageIcon, Film, CheckCircle, AlertCircle } from 'l
 
 import { Button } from '@/components/ui/Button'
 import { Textarea } from '@/components/ui/Textarea'
-import { useCreatePostMutation } from '../hooks'
 
 export function CreatePostPage() {
   const router = useRouter()
-  const createPostMutation = useCreatePostMutation()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState('')
@@ -116,19 +114,11 @@ export function CreatePostPage() {
           <Button
             onClick={async () => {
               if (!selectedFile) return
-              const mediaUrl = await new Promise<string>((resolve, reject) => {
-                const reader = new FileReader()
-                reader.onload = () => resolve(String(reader.result || ''))
-                reader.onerror = reject
-                reader.readAsDataURL(selectedFile)
-              })
-              await createPostMutation.mutateAsync({ caption, media_url: mediaUrl })
-              setUploadComplete(true)
-              router.push('/feed')
+              setError('سرویس ایجاد پست در حال حاضر در دسترس نیست.')
             }}
-            disabled={!selectedFile || createPostMutation.isPending || uploadComplete}
+            disabled={!selectedFile || uploadComplete}
           >
-            {createPostMutation.isPending ? 'در حال انتشار...' : 'انتشار پست'}
+            انتشار پست
           </Button>
         </div>
       </div>
