@@ -105,12 +105,16 @@ export function RegisterPage() {
                       setValidationError('رمز عبور و تکرار آن یکسان نیستند.')
                       return
                     }
-                    const result = await registerMutation.mutateAsync({
-                      email: formData.email,
-                      username: formData.username,
-                      password: formData.password,
-                    })
-                    router.push(`/profile/${encodeURIComponent(result.profile.username)}`)
+                    try {
+                      const result = await registerMutation.mutateAsync({
+                        email: formData.email,
+                        username: formData.username,
+                        password: formData.password,
+                      })
+                      router.push(`/profile/${encodeURIComponent(result.profile.username)}`)
+                    } catch {
+                      // React Query exposes the failure through registerMutation.error.
+                    }
                   }}
                   className="space-y-4"
                 >

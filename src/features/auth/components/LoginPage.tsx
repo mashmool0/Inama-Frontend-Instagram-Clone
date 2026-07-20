@@ -66,8 +66,12 @@ export function LoginPage() {
             <form
               onSubmit={async (event) => {
                 event.preventDefault()
-                const result = await loginMutation.mutateAsync(formData)
-                router.push(searchParams.get('next') || `/profile/${encodeURIComponent(result.profile.username)}`)
+                try {
+                  const result = await loginMutation.mutateAsync(formData)
+                  router.push(searchParams.get('next') || `/profile/${encodeURIComponent(result.profile.username)}`)
+                } catch {
+                  // React Query exposes the failure through loginMutation.error.
+                }
               }}
               className="space-y-5"
             >
